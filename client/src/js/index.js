@@ -1,7 +1,7 @@
+import Editor from './editor.js';
+import './database.js';
+import './install.js';
 import { Workbox } from 'workbox-window';
-import Editor from './editor';
-import './database';
-import '../css/style.css';
 
 const main = document.querySelector('#main');
 main.innerHTML = '';
@@ -11,23 +11,35 @@ const loadSpinner = () => {
   spinner.classList.add('spinner');
   spinner.innerHTML = `
   <div class="loading-container">
-  <div class="loading-spinner" />
-  </div>
-  `;
+    <div class="loading-spinner"></div>
+  </div>`;
   main.appendChild(spinner);
 };
 
 const editor = new Editor();
 
-if (typeof editor === 'undefined') {
+if (!editor) {
   loadSpinner();
 }
 
-// Check if service workers are supported
 if ('serviceWorker' in navigator) {
-  // register workbox service worker
-  const workboxSW = new Workbox('/src-sw.js');
-  workboxSW.register();
+  window.addEventListener('load', () => {
+    // Register the service worker
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(() => {
+        console.log('Service worker registered successfully');
+        // Once the service worker is registered, initialize workbox
+        initWorkbox();
+      })
+      .catch((error) => {
+        console.error('Service worker registration failed:', error);
+      });
+  });
 } else {
   console.error('Service workers are not supported in this browser.');
+}
+
+function initWorkbox() {
+  const workboxSW = new Workbox('/service-worker.js');
+  workboxSW.register();
 }

@@ -2,6 +2,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const path = require('path');
 const { GenerateSW } = require('workbox-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin'); // Add CopyWebpackPlugin
 
 module.exports = {
   mode: 'development',
@@ -48,6 +49,13 @@ module.exports = {
       swDest: 'service-worker.js',
       include: [/\.html$/, /\.js$/, /\.css$/, /\.ico$/, /\.json$/],
     }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'src/css', to: 'src/css' }, // Copy src/css folder and contents
+        { from: 'src/images', to: 'src/images' }, // Copy src/images folder and contents
+        { from: 'src/js', to: 'src/js' }, // Copy src/js folder and contents
+      ]
+    }),
   ],
   module: {
     rules: [
@@ -64,7 +72,16 @@ module.exports = {
             presets: ['@babel/preset-env']
           }
         }
-      }
+      },
+      // Add additional rules for handling other file types if needed
+      // {
+      //   test: /\.(png|jpg|gif)$/i,
+      //   use: [
+      //     {
+      //       loader: 'file-loader',
+      //     },
+      //   ],
+      // },
     ],
   },
 };
